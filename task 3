@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic-Tac-Toe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Tic-Tac-Toe</h1>
+    <div id="board" class="board">
+      <div class="cell" data-cell-index="0"></div>
+      <div class="cell" data-cell-index="1"></div>
+      <div class="cell" data-cell-index="2"></div>
+      <div class="cell" data-cell-index="3"></div>
+      <div class="cell" data-cell-index="4"></div>
+      <div class="cell" data-cell-index="5"></div>
+      <div class="cell" data-cell-index="6"></div>
+      <div class="cell" data-cell-index="7"></div>
+      <div class="cell" data-cell-index="8"></div>
+    </div>
+    <button id="restart-btn" class="restart-btn">Restart</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+  .container {
+  text-align: center;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 100px);
+  grid-gap: 5px;
+  margin: 20px auto;
+}
+
+.cell {
+  width: 100px;
+  height: 100px;
+  background-color: #ddd;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2em;
+  cursor: pointer;
+}
+
+.restart-btn {
+  padding: 10px 20px;
+  font-size: 1em;
+  cursor: pointer;
+}
+const X_CLASS = 'x';
+const O_CLASS = 'o';
+const WINNING_COMBINATIONS = [
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6]
+];
+
+const cells = document.querySelectorAll('.cell');
+const restartButton = document.getElementById('restart-btn');
+let currentPlayer = X_CLASS;
+
+startGame();
+
+restartButton.addEventListener('click', startGame);
+
+function startGame() {
+  cells.forEach(cell => {
+    cell.classList.remove(X_CLASS);
+    cell.classList.remove(O_CLASS);
+    cell.removeEventListener('click', handleClick);
+    cell.addEventListener('click', handleClick, { once: true });
+  });
+  setHoverClass();
+}
+
+function handleClick(event) {
+  const cell = event.target;
+  const currentClass = currentPlayer === X_CLASS ? X_CLASS : O_CLASS;
+  placeMark(cell, currentClass);
+  if (checkWin(currentClass)) {
+    endGame(false);
+  } else if (isDraw()) {
+    endGame(true);
+  } else {
+    swapTurns();
+    setHoverClass();
+  }
+}
+
+function placeMark(cell, currentClass) {
+  cell.classList.add(currentClass);
+}
+
+function swapTurns() {
+  currentPlayer = currentPlayer === X_CLASS ? O_CLASS : X_CLASS;
+}
+
+function setHoverClass() {
+  document.body.classList.remove(X_CLASS);
+  document.body.classList.remove(O_CLASS);
+  document.body.classList.add(currentPlayer);
+}
+
+function checkWin(currentClass) {
+  return WINNING_COMBINATIONS.some(combination => {
+    return combination.every(index => {
+      return cells[index].classList.contains(currentClass);
+    });
+  });
+}
+
+function isDraw() {
+  return [...cells].every(cell => {
+    return cell.classList.contains(X_CLASS) || cell.classList.contains(O_CLASS);
+  });
+}
+
+function endGame(draw) {
+  if (draw) {
+    alert('It\'s a draw!');
+  } else {
+    alert(${currentPlayer === X_CLASS ? "X" : "O"} wins!);
+  }
+  startGame();
+}
